@@ -1,0 +1,32 @@
+{
+  "name": "snipico",
+  "version": "1.0.0",
+  "description": "Snipico - 軽量画像クロップツール for アイコン作成",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": ["crop", "image", "icon", "ico", "snipico"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "sharp": "^0.33.1"
+  },
+  "build": {
+    "appId": "com.tools.snipico",
+    "productName": "Snipico",
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
+    }
+  }
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snipico</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- サイドバー -->
+    <aside class="sidebar">
+      <!-- タブ切り替え -->
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="crop">クロップ</button>
+        <button class="tab-btn" data-tab="ico-viewer">ICO閲覧</button>
+      </div>
+
+      <!-- クロップモードタブ -->
+      <div id="crop-tab" class="tab-content active">
+        <h2>クロップモード</h2>
+        <div class="mode-selector">
+          <label class="mode-option">
+            <input type="radio" name="mode" value="center" checked>
+            <span class="mode-label">中心クロップ (1:1)</span>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="free">
+            <span class="mode-label">フリー選択</span>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="fixed">
+            <span class="mode-label">固定サイズ</span>
+          </label>
+        </div>
+
+        <!-- 中心クロップ設定 -->
+        <div id="center-options" class="mode-options">
+          <label>
+            クロップサイズ: <span id="center-size-display">50%</span>
+          </label>
+          <input type="range" id="center-size" min="10" max="100" value="50">
+        </div>
+
+        <!-- 固定サイズ設定 -->
+        <div id="fixed-options" class="mode-options" style="display:none">
+          <label>幅 (px): <input type="number" id="fixed-width" value="256" min="1"></label>
+          <label>高さ (px): <input type="number" id="fixed-height" value="256" min="1"></label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="lock-ratio"> 縦横比を固定
+          </label>
+        </div>
+
+        <hr>
+
+        <h2>表示</h2>
+        <div class="zoom-controls">
+          <label>ズーム: <span id="zoom-display">100%</span></label>
+          <input type="range" id="zoom-slider" min="10" max="500" value="100">
+          <div class="zoom-buttons">
+            <button id="zoom-fit" class="btn btn-small">フィット</button>
+            <button id="zoom-100" class="btn btn-small">100%</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <h2>角丸</h2>
+        <div class="corner-radius-controls">
+          <label class="checkbox-label">
+            <input type="checkbox" id="enable-corner-radius"> 角丸を適用
+          </label>
+          <div id="corner-radius-options" style="display:none">
+            <label>
+              半径: <span id="corner-radius-display">20%</span>
+            </label>
+            <input type="range" id="corner-radius" min="0" max="50" value="20">
+            <div class="radius-presets">
+              <button class="btn btn-small" data-radius="10">10%</button>
+              <button class="btn btn-small" data-radius="25">25%</button>
+              <button class="btn btn-small" data-radius="50">円形</button>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <h2>保存オプション</h2>
+        <div class="save-options">
+          <label>
+            フォーマット:
+            <select id="save-format">
+              <option value="png">PNG</option>
+              <option value="jpg">JPEG</option>
+              <option value="webp">WebP</option>
+            </select>
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" id="save-as-icon"> アイコンとして保存
+          </label>
+
+          <div id="icon-options" style="display:none">
+            <p class="info-text">Windows ICO (マルチサイズ)</p>
+            <div class="icon-sizes">
+              <label><input type="checkbox" data-size="16" checked> 16x16</label>
+              <label><input type="checkbox" data-size="24" checked> 24x24</label>
+              <label><input type="checkbox" data-size="32" checked> 32x32</label>
+              <label><input type="checkbox" data-size="48" checked> 48x48</label>
+              <label><input type="checkbox" data-size="64"> 64x64</label>
+              <label><input type="checkbox" data-size="128"> 128x128</label>
+              <label><input type="checkbox" data-size="256" checked> 256x256</label>
+            </div>
+            <button id="save-icon-pngs" class="btn btn-secondary">個別PNGで保存</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="actions">
+          <button id="open-btn" class="btn btn-primary">画像を開く</button>
+          <button id="save-btn" class="btn btn-success" disabled>保存</button>
+          <button id="reset-btn" class="btn btn-secondary" disabled>リセット</button>
+        </div>
+
+        <div id="image-info" class="image-info"></div>
+      </div>
+
+      <!-- ICO閲覧タブ -->
+      <div id="ico-viewer-tab" class="tab-content">
+        <h2>ICOファイル閲覧</h2>
+        <p class="info-text">ICOファイルに含まれる各サイズの画像を確認できます</p>
+
+        <div class="actions">
+          <button id="open-ico-btn" class="btn btn-primary">ICOを開く</button>
+        </div>
+
+        <div id="ico-info" class="image-info"></div>
+      </div>
+    </aside>
+
+    <!-- メインエリア -->
+    <main class="main-area">
+      <!-- クロップビュー -->
+      <div id="crop-view" class="view-container">
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-message">
+            <p>ここに画像をドロップ</p>
+            <p>または「画像を開く」ボタンをクリック</p>
+          </div>
+          <div id="canvas-wrapper" class="canvas-wrapper" style="display:none">
+            <div id="canvas-container" class="canvas-container">
+              <canvas id="main-canvas"></canvas>
+              <div id="crop-overlay" class="crop-overlay"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- プレビュー -->
+        <div id="preview-section" class="preview-section" style="display:none">
+          <h3>プレビュー</h3>
+          <canvas id="preview-canvas"></canvas>
+          <p id="preview-info"></p>
+        </div>
+      </div>
+
+      <!-- ICO閲覧ビュー -->
+      <div id="ico-view" class="view-container" style="display:none">
+        <div id="ico-drop-zone" class="drop-zone">
+          <div class="ico-drop-message">
+            <p>ここにICOファイルをドロップ</p>
+            <p>または「ICOを開く」ボタンをクリック</p>
+          </div>
+          <div id="ico-grid" class="ico-grid" style="display:none"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
